@@ -16,7 +16,14 @@ git checkout -b feature/challenge-docker
 ```
 this clone the repo, create the new branch develop, create the file .gitignore and commit this initial structure, and create the feature branch 
 
+```bash
+git checkout develop
+git merge feature/challenge-docker
+git push origin develop
+```
 
+so after pushing working code on the feature branch i merged the feature/challenge-docker in the develop. 
+ 
 ### DOCKER :
 
 blockonote dockerfile create a flask app by starting from an alpine after it copies the requirements.txt file and install all the requiremets inside the docker instance
