@@ -1,0 +1,20 @@
+services:
+  bandiera:
+    build: .
+    environment:
+      - MYSQL_HOST=db 
+      - MYSQL_USER=bandiera 
+      - MYSQL_PASSWORD=79eecfbcfe01
+      - MYSQL_DB=bandiere
+    ports:
+      - "8181:3000"
+    restart: unless-stopped
+  db:
+    image: mysql:9.2
+    environment:
+      - MYSQL_USER=bandiera
+      - MYSQL_PASSWORD=79eecfbcfe01
+      - MYSQL_DATABASE=bandiere
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+    ports:
+      - "3306:3306"

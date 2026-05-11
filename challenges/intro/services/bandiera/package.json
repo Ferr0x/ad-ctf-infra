@@ -1,0 +1,22 @@
+{
+  "name": "bandiera",
+  "version": "1.0.0",
+  "description": "Simple service to store flags.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "flag",
+    "ctf",
+    "ad"
+  ],
+  "author": "kriive",
+  "license": "WTFPL",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "mysql2": "^3.13.0"
+  }
+}
