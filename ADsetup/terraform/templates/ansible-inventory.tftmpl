@@ -1,0 +1,8 @@
+[gameserver]
+gameserver0 ansible_host=${gameserver}
+
+[vulnboxes]
+%{ for index, v in vulnboxes ~}
+${ v.name } ansible_host=${ v.vulnbox_ip }
+%{ endfor ~}
+

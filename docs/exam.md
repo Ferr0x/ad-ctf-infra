@@ -30,3 +30,40 @@ blockonote dockerfile create a flask app by starting from an alpine after it cop
 in the end after setting /app as workir it runs the command `flash run --host 0.0.0.0`
 
 the dockercompose file setup some basic stuff like max number of pid it expose the port 5000 on the remote port 1337
+
+
+### TERRAFORM :
+So the structure of the dir terraform is this one  :
+```bash 
+.
+├── main.tf
+├── modules
+│   ├── gameserver
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── security_groups
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── vpc
+│   │   ├── main.tf
+│   │   └── outputs.tf
+│   └── vulnboxes
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+├── outputs.tf
+├── templates
+│   └── ansible-inventory.tftmpl
+├── terraform.tfstate
+└── terraform.tfstate.backup
+
+  
+```
+As we can see there is a main.tf that orchestrate different modules.
+
+1. vpc : first modules that runs and create the network, it expose the ID of vpc the ID of the subnet and the ID of the gateway those ids are passed to main.tf and subsequently to all other modules.
+2. gameserver : takes those IDs and create the central server of the game, apply a dedicated security group that only opens SSH and the WireGuard port. the only output is the elastic ip.
+3. security group : takes the ids and create a security group and return the security id
+4. vulboxes : it is instantiated as many times as files inside ../deploy/vulnboxes that is generated from the file gen.py for each file it creates an istance 
