@@ -1,0 +1,127 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Set a hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+
+- hosts: gameserver
+  become: yes
+  tasks:
+    - name: Enable IP forwarding
+      ansible.builtin.lineinfile:
+        path: /etc/sysctl.conf
+        line: net.ipv4.ip_forward = 1
+        create: yes
+
+    - name: Reload sysctl
+      ansible.builtin.command: sysctl -p
+
+    - name: Copy net_open.sh to /usr/bin
+      ansible.builtin.copy:
+        src: ../deploy/bin/net_open.sh
+        dest: /usr/bin/net_open.sh
+        owner: root
+        group: root
+        mode: u=rwx,g=rx,o=rx
+  
+    - name: Copy net_closed.sh to /usr/bin
+      ansible.builtin.copy:
+        src: ../deploy/bin/net_closed.sh
+        dest: /usr/bin/net_closed.sh
+        owner: root
+        group: root
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Copy netplan config to /etc/netplan/60-wg.yaml
+      ansible.builtin.copy:
+        src: ../deploy/router/router.yaml
+        dest: /etc/netplan/60-wg.yaml
+        owner: root
+        group: root
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Reload netplan
+      ansible.builtin.command: netplan apply
+
+- hosts: vulnboxes
+  become: yes
+  tasks:
+    - name: Change root password
+      user:
+        name: root
+        update_password: always
+        password: "{{ lookup('password', '../deploy/teams/' + inventory_hostname + '/root_pwd.txt chars=ascii_lowercase,digits length=15') | password_hash('sha512')}}"
+
+    - name: Copy game.conf
+      copy:
+        src: "../deploy/vulnboxes/wg/{{ inventory_hostname }}"
+        dest: /etc/wireguard/game.conf
+
+    - name: Creating a file with content
+      copy:
+        # Creating it at number 10 and not a higher number,
+        # because only the first value of conflicting properties is taken
+        # into account.
+        dest: "/etc/ssh/sshd_config.d/10-root-login.conf"
+        mode: 0644
+        content: |
+          PermitRootLogin yes
+          PasswordAuthentication yes
+      notify:
+        - restart ssh
+
+    - name: Enable Wireguard interface
+      ansible.builtin.systemd_service:
+        name: wg-quick@game
+        state: started
+        enabled: true
+
+  handlers:
+    - name: restart ssh
+      systemd_service:
+        name: ssh
+        state: restarted
+
+- hosts: vulnboxes
+  become: yes
+  tasks:
+    - name: Copy challenges
+      ansible.posix.synchronize:
+        src: "../challenges/"
+        dest: "/root/services/"
+
+    - name: Start all the challenges
+      ansible.builtin.command:
+        cmd: /root/services/start.sh
+        chdir: /root/services
+
+- hosts: gameserver
+  become: no
+  tasks:
+    - name: Install pre-requisite packages
+      become: yes
+      ansible.builtin.apt:
+        name:
+          - python3.12-venv
+        state: present
+    - name: Install ForcAD
+      ansible.builtin.git:
+        repo: https://github.com/havce/ForcAD.git
+        dest: /home/ubuntu/ForcAD
+        single_branch: yes
+        version: master
+        force: yes
+    - name: Copy config.yml to root of ForcAD
+      ansible.builtin.copy:
+        src: ../deploy/config.yml
+        dest: /home/ubuntu/ForcAD/config.yml
+        owner: ubuntu
+        group: ubuntu
+        mode: u=rwx,g=rwx,o=
+    - name: Copy checkers
+      ansible.posix.synchronize:
+        src: "../checkers/"
+        dest: "/home/ubuntu/ForcAD/checkers/"
+
