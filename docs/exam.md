@@ -67,3 +67,23 @@ As we can see there is a main.tf that orchestrate different modules.
 2. gameserver : takes those IDs and create the central server of the game, apply a dedicated security group that only opens SSH and the WireGuard port. the only output is the elastic ip.
 3. security group : takes the ids and create a security group and return the security id
 4. vulboxes : it is instantiated as many times as files inside ../deploy/vulnboxes that is generated from the file gen.py for each file it creates an istance 
+
+
+### ANSIBLE
+
+- packer.yml: add my ssh key install wireguard and download and set up docker.
+- playbook.yml : there are different plays 
+  - gameserver : allow ip forwarding, copy the scripts, copy the wireguard config.
+  - vulnboxes : crate password, copy wirguard config,copy the challenges, stars the challenge (file start.sh under challenges) 
+  - gameserver pt2: install python and clone forcAD copied it here : (https://github.com/pomo-mondreganto/ForcAD). 
+
+### Makefile
+the Makefile it is made to automate the following tasks
+
+1. venv: this is used to create and setup a python virtual environment.
+2. prepare: missing file is used to move the challenge inside the right dir and the checker in the right dir, it also merge up all the requirements
+3. pack: prepare wireguard packet, create zip with config  
+4. infra: create the terraform infrastructure 
+5. deploy: execute playbook ansible 
+6. all: execute all the task
+7. nuke: destroy all the terraform and delete zip file 
