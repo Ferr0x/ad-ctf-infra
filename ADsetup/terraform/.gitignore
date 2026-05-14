@@ -4,3 +4,4 @@ terraform.tfstate
 terraform.tfstate.backup
 *.tfstate
 *.tfstate.*
+ami.auto.tfvars

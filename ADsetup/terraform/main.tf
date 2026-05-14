@@ -9,8 +9,18 @@ terraform {
   required_version = ">= 1.2.0"
 }
 
+variable "aws_region" {
+  type    = string
+  default = "eu-west-1"
+}
+
+variable "ami_id" {
+  type    = string
+  default = "ami-055cb4a9ada798dbe"
+}
+
 provider "aws" {
-  region = "eu-west-1"
+  region = var.aws_region
 }
 
 module "vpc" {
@@ -18,7 +28,7 @@ module "vpc" {
 }
 
 locals {
-  ami = "ami-055cb4a9ada798dbe" # auto gen, cambiare questo dopo packer build 
+  ami = var.ami_id
 }
 
 module "gameserver" {
@@ -66,4 +76,3 @@ resource "local_file" "ansible_inventory" {
   )
   filename = "../deploy/inventory.ini"
 }
-
