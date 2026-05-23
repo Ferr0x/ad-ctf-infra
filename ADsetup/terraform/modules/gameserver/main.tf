@@ -57,6 +57,9 @@ resource "aws_eip" "gameserver" {
 resource "aws_instance" "gameserver" {
   ami           = var.ami_id
   instance_type = var.instance_type
+  key_name      = var.ssh_key_name
+  user_data     = var.user_data
+  user_data_replace_on_change = true
 
   network_interface {
     network_interface_id = aws_network_interface.gameserver.id
@@ -72,9 +75,9 @@ resource "aws_instance" "gameserver" {
   }
 
   metadata_options {
-    http_endpoint = "disabled"
+    http_endpoint = "enabled"
+    http_tokens   = "required"
   }
 
   depends_on = [data.aws_internet_gateway.igw]
 }
-
