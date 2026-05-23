@@ -15,6 +15,16 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
+variable "ssh_key_name" {
+  description = "The EC2 key pair name to allow SSH access."
+  type        = string
+}
+
+variable "user_data" {
+  description = "Cloud-init user data for instance bootstrap."
+  type        = string
+}
+
 variable "vpc_id" {
   description = "The VPC id where the gameserver will be placed."
   type        = string
@@ -30,4 +40,3 @@ variable "volume_size" {
   type        = string
   default     = "64"
 }
-

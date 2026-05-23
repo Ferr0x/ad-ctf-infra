@@ -29,6 +29,16 @@ variable "instance_type" {
   default     = "t3.micro" # change this: change this if you want a running ad 
 }
 
+variable "ssh_key_name" {
+  description = "The EC2 key pair name to allow SSH access."
+  type        = string
+}
+
+variable "user_data" {
+  description = "Cloud-init user data for instance bootstrap."
+  type        = string
+}
+
 variable "igw_id" {
   description = "The ID of the default Internet Gateway"
   type        = string
@@ -39,4 +49,3 @@ variable "volume_size" {
   type        = string
   default     = "64"
 }
-

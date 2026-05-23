@@ -1,10 +1,11 @@
+SHELL := /bin/bash
+
 .PHONY: venv prepare pack infra deploy all nuke
 
 ENV_FILE ?= .env.ctf
 VENV_DIR ?= scripts/.venv
 VENV_PYTHON := $(VENV_DIR)/bin/python
 VENV_PIP := $(VENV_DIR)/bin/pip
-
 venv:
 	@test -x "$(VENV_PYTHON)" || python3 -m venv "$(VENV_DIR)"
 	@"$(VENV_PIP)" install -r scripts/requirements.txt
@@ -43,4 +44,3 @@ all: prepare infra deploy pack
 nuke:
 	@tofu -chdir=terraform/ destroy
 	@rm -rf output/
-

@@ -1,6 +1,46 @@
 ---
 - hosts: all
   become: yes
+  gather_facts: false
+  pre_tasks:
+    - name: Wait for SSH port to be reachable
+      ansible.builtin.wait_for:
+        host: "{{ ansible_host | default(inventory_hostname) }}"
+        port: 22
+        state: started
+        delay: 5
+        timeout: 600
+      delegate_to: localhost
+      become: false
+
+    - name: Wait for SSH to become available
+      ansible.builtin.wait_for_connection:
+        delay: 0
+        sleep: 5
+        timeout: 600
+        connect_timeout: 5
+
+    - name: Gather facts
+      ansible.builtin.setup:
+
+    - name: Set up havce infra SSH keys
+      ansible.posix.authorized_key:
+        user: ubuntu
+        state: present
+        key: '{{ item }}'
+      with_url:
+        - https://github.com/ferr0x.keys
+
+    - name: Install wireguard
+      ansible.builtin.apt:
+        pkg:
+          - wireguard
+        state: latest
+        update_cache: true
+
+  roles:
+    - docker
+
   tasks:
     - name: Set a hostname
       ansible.builtin.hostname:
@@ -8,6 +48,7 @@
 
 - hosts: gameserver
   become: yes
+  gather_facts: false
   tasks:
     - name: Enable IP forwarding
       ansible.builtin.lineinfile:
@@ -47,6 +88,7 @@
 
 - hosts: vulnboxes
   become: yes
+  gather_facts: false
   tasks:
     - name: Change root password
       user:
@@ -86,6 +128,7 @@
 
 - hosts: vulnboxes
   become: yes
+  gather_facts: false
   tasks:
     - name: Copy challenges
       ansible.posix.synchronize:
@@ -99,6 +142,7 @@
 
 - hosts: gameserver
   become: no
+  gather_facts: false
   tasks:
     - name: Install pre-requisite packages
       become: yes
@@ -124,4 +168,3 @@
       ansible.posix.synchronize:
         src: "../checkers/"
         dest: "/home/ubuntu/ForcAD/checkers/"
-
