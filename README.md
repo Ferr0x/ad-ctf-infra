@@ -20,3 +20,8 @@ in this repo there is only the intro category but soon i will push also the cryp
     set -x AWS_REGION eu-west-1
 
 ```
+3. make all
+
+```
+    make all   
+```

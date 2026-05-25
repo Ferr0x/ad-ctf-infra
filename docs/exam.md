@@ -68,10 +68,12 @@ As we can see there is a main.tf that orchestrate different modules.
 3. security group : takes the ids and create a security group and return the security id
 4. vulboxes : it is instantiated as many times as files inside ../deploy/vulnboxes that is generated from the file gen.py for each file it creates an istance 
 
+To access the instances Terraform fetches all SSH keys from `ssh_public_key_url` (default `https://github.com/ferr0x.keys`) and injects them into `ubuntu`'s `authorized_keys` at boot. It still creates an EC2 key pair using the first key. Override it with `TF_VAR_ssh_public_key_url` or change `ssh_key_name` if needed.
+
 
 ### ANSIBLE
 
-- packer.yml: add my ssh key install wireguard and download and set up docker.
+- No AMI/packer build anymore; provisioning happens via playbook.yml on running instances.
 - playbook.yml : there are different plays 
   - gameserver : allow ip forwarding, copy the scripts, copy the wireguard config.
   - vulnboxes : crate password, copy wirguard config,copy the challenges, stars the challenge (file start.sh under challenges) 
