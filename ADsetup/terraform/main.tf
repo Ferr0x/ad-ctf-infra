@@ -101,7 +101,8 @@ module "gameserver" {
   ami_id    = local.ami
   subnet_id = module.vpc.public_subnet_id
 
-  instance_type = "t3.micro" # cambiare questo setup di default per non pagare.
+  # instance_type = "t3.micro" # cambiare questo setup di default per non pagare.
+  instance_type = "c5.xlarge" # this is ste right instance 
   ssh_key_name  = aws_key_pair.deployer.key_name
   user_data     = local.ssh_user_data
 }
@@ -128,8 +129,8 @@ module "vulnboxes" {
   ssh_key_name = aws_key_pair.deployer.key_name
   user_data    = local.ssh_user_data
 
-  # instance_type = "c5.xlarge" # this is ste right instance 
-  instance_type = "t3.micro"
+  instance_type = "c5.xlarge" # this is ste right instance 
+  # instance_type = "t3.micro"
 }
 
 resource "local_file" "ansible_inventory" {
